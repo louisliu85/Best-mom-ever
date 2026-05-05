@@ -145,13 +145,30 @@
                 <div id="photostrip" class="w-[340px] h-[1020px] bg-mom-bg strip-texture p-4 shadow-xl relative border-2 border-white rounded-sm no-select">
                     <div id="photostrip-content" class="w-full h-full flex flex-col justify-between relative transition-transform duration-500">
                         
-                        <!-- 小貼紙區 -->
-                        <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23a855f7' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E" class="absolute top-[210px] left-[15px] w-9 h-9 transform -rotate-12 z-20 drop-shadow-sm" alt="heart">
-                        <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23facc15' d='M12 1L14.8 9.2L23 12L14.8 14.8L12 23L9.2 14.8L1 12L9.2 9.2L12 1Z'/%3E%3C/svg%3E" class="absolute top-[440px] right-[12px] w-8 h-8 transform rotate-12 z-20 drop-shadow-sm" alt="star">
-                        <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23FFA6C9' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E" class="absolute top-[810px] right-[18px] w-10 h-10 transform rotate-[15deg] z-20 drop-shadow-sm" alt="heart">
-                        <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23f472b6' d='M12,2c0,0-2,4-2,6c0,2.2,1.8,4,4,4s4-1.8,4-4C18,6,16,2,16,2s-4,2-4,4c0,2.2,1.8,4,4,4s4-1.8,4-4C20,4,16,0,16,0S12,2,12,2z M12,2c0,0,2,4,2,6c0,2.2-1.8,4-4,4s-4-1.8-4-4C6,6,8,2,8,2s4,2,4,4c0,2.2-1.8,4-4,4s-4-1.8-4-4C4,4,8,0,8,0S12,2,12,2z'/%3E%3C/svg%3E" class="absolute top-[320px] right-[15px] w-10 h-10 transform rotate-[30deg] z-20 drop-shadow-sm opacity-80" alt="flower">
-                        <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23facc15' d='M12 1L14.8 9.2L23 12L14.8 14.8L12 23L9.2 14.8L1 12L9.2 9.2L12 1Z'/%3E%3C/svg%3E" class="absolute top-[560px] left-[10px] w-6 h-6 transform rotate-[-15deg] z-20 drop-shadow-sm" alt="sparkle">
-                        <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23d8b4fe' d='M12,2c0,0-2,4-2,6c0,2.2,1.8,4,4,4s4-1.8,4-4C18,6,16,2,16,2s-4,2-4,4c0,2.2,1.8,4,4,4s4-1.8,4-4C20,4,16,0,16,0S12,2,12,2z M12,2c0,0,2,4,2,6c0,2.2-1.8,4-4,4s-4-1.8-4-4C6,6,8,2,8,2s4,2,4,4c0,2.2-1.8,4-4,4s-4-1.8-4-4C4,4,8,0,8,0S12,2,12,2z'/%3E%3C/svg%3E" class="absolute bottom-[220px] left-[12px] w-11 h-11 transform rotate-[-45deg] z-20 drop-shadow-sm opacity-90" alt="flower">
+                        <!-- 小貼紙區 (全面改用 Inline SVG，徹底解決 Android 匯出破圖與變形問題) -->
+                        <svg class="absolute top-[210px] left-[15px] w-9 h-9 transform -rotate-12 z-20 text-[#a855f7]" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        
+                        <svg class="absolute top-[440px] right-[12px] w-8 h-8 transform rotate-12 z-20 text-[#facc15]" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="currentColor" d="M12 1L14.8 9.2L23 12L14.8 14.8L12 23L9.2 14.8L1 12L9.2 9.2L12 1Z"/>
+                        </svg>
+                        
+                        <svg class="absolute top-[810px] right-[18px] w-10 h-10 transform rotate-[15deg] z-20 text-[#FFA6C9]" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        
+                        <svg class="absolute top-[320px] right-[15px] w-10 h-10 transform rotate-[30deg] z-20 opacity-80 text-[#f472b6]" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="currentColor" d="M12,2c0,0-2,4-2,6c0,2.2,1.8,4,4,4s4-1.8,4-4C18,6,16,2,16,2s-4,2-4,4c0,2.2,1.8,4,4,4s4-1.8,4-4C20,4,16,0,16,0S12,2,12,2z M12,2c0,0,2,4,2,6c0,2.2-1.8,4-4,4s-4-1.8-4-4C6,6,8,2,8,2s4,2,4,4c0,2.2-1.8,4-4,4s-4-1.8-4-4C4,4,8,0,8,0S12,2,12,2z"/>
+                        </svg>
+                        
+                        <svg class="absolute top-[560px] left-[10px] w-6 h-6 transform rotate-[-15deg] z-20 text-[#facc15]" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="currentColor" d="M12 1L14.8 9.2L23 12L14.8 14.8L12 23L9.2 14.8L1 12L9.2 9.2L12 1Z"/>
+                        </svg>
+                        
+                        <svg class="absolute bottom-[220px] left-[12px] w-11 h-11 transform rotate-[-45deg] z-20 opacity-90 text-[#d8b4fe]" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="currentColor" d="M12,2c0,0-2,4-2,6c0,2.2,1.8,4,4,4s4-1.8,4-4C18,6,16,2,16,2s-4,2-4,4c0,2.2,1.8,4,4,4s4-1.8,4-4C20,4,16,0,16,0S12,2,12,2z M12,2c0,0,2,4,2,6c0,2.2-1.8,4-4,4s-4-1.8-4-4C6,6,8,2,8,2s4,2,4,4c0,2.2-1.8,4-4,4s-4-1.8-4-4C4,4,8,0,8,0S12,2,12,2z"/>
+                        </svg>
 
                         <div class="flex flex-col items-center mt-4 mb-1 z-10 shrink-0">
                             <div class="text-center text-purple-400 text-sm font-bold tracking-widest uppercase pb-1 relative left-[0px] mt-[-2px]" id="current-date">
