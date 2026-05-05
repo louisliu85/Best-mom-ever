@@ -58,6 +58,11 @@
         .btn-active-scale:active {
             transform: scale(0.9);
         }
+
+        /* 💡 禁用連點雙擊縮放 */
+        body {
+            touch-action: manipulation;
+        }
     </style>
 </head>
 <body class="bg-purple-50 min-h-screen text-gray-800 font-sans selection:bg-purple-300">
@@ -98,7 +103,7 @@
                 <div class="flex flex-col gap-4">
                     <button id="btn-start" class="w-full bg-purple-100 hover:bg-purple-200 text-mom-dark font-bold py-4 px-4 rounded-xl transition shadow-sm flex items-center justify-center gap-2">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                        允許使用相機權限
+                        點我允許使用相機權限
                     </button>
 
                     <div id="camera-main-controls" class="flex items-center justify-between px-6 py-2 hidden">
@@ -254,6 +259,17 @@
     </div>
 
     <script>
+        // 💡 禁用雙指放大 (Pinch-to-zoom) 與 Safari 手勢縮放
+        document.addEventListener('touchstart', function (event) {
+            if (event.touches.length > 1) {
+                event.preventDefault(); // 偵測到兩根以上手指時，阻止預設縮放行為
+            }
+        }, { passive: false });
+        
+        document.addEventListener('gesturestart', function (event) {
+            event.preventDefault(); // 禁用 Safari 的原生手勢縮放
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             const video = document.getElementById('webcam');
             const placeholder = document.getElementById('camera-placeholder');
@@ -302,6 +318,16 @@
                         audio: false 
                     });
                     video.srcObject = stream;
+                    
+                    // 💡 僅針對「相機預覽畫面」設定翻轉，並微微放大 (1.02 倍) 以消除邊緣黑線公差
+                    if (facingMode === "user") {
+                        // 內鏡頭：取消鏡像，同時微微放大
+                        video.style.transform = "scale(-1.02, 1.02)"; 
+                    } else {
+                        // 外鏡頭：保持真實方向，同時微微放大
+                        video.style.transform = "scale(1.02, 1.02)";  
+                    }
+
                     video.onloadedmetadata = () => {
                         video.play();
                         video.classList.remove('hidden');
@@ -401,8 +427,16 @@
                     sx = 0; sy = (video.videoHeight - sHeight) / 2;
                 }
                 
-                // 取消強制左右反轉，拍出來的照片都會是正向的（文字不會反）
+                // 💡 設定：內鏡頭拍攝時進行左右翻轉 (鏡像，文字會是反的)，外鏡頭則維持真實方向
+                if (facingMode === "user") {
+                    ctx.translate(targetWidth, 0); 
+                    ctx.scale(-1, 1);
+                }
+                
                 ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, targetWidth, targetHeight);
+                
+                // 畫完照片後，將畫布變形重置，確保後續疊加的紫色濾鏡不受影響
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
                 
                 ctx.fillStyle = 'rgba(216, 180, 254, 0.03)'; ctx.fillRect(0, 0, targetWidth, targetHeight);
                 
