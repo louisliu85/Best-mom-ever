@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>三重限定母親節拍貼機 🌸</title>
+    <title>三重限定母親節拍貼機</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -107,13 +107,15 @@
                         點我允許使用相機權限
                     </button>
 
-		    <div id="filter-controls" class="grid grid-cols-6 gap-2 hidden transition-all mx-auto w-full max-w-[320px]">
-                        <button class="filter-btn w-full py-1.5 rounded-full text-sm font-bold bg-mom-dark text-white shadow-sm transition btn-active-scale" data-filter="none">原圖</button>
-                        <button class="filter-btn w-full py-1.5 rounded-full text-sm font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="film">復古</button>
-                        <button class="filter-btn w-full py-1.5 rounded-full text-sm font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="beauty">粉嫩</button>
-                        <button class="filter-btn w-full py-1.5 rounded-full text-sm font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="texture">質感</button>
-                        <button class="filter-btn w-full py-1.5 rounded-full text-sm font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="polaroid">溫暖</button>
-                        <button class="filter-btn w-full py-1.5 rounded-full text-sm font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="bw">黑白</button>
+		    <div id="filter-controls" class="grid grid-cols-8 gap-2 hidden transition-all mx-auto w-full max-w-[340px]">
+                        <button class="filter-btn w-full py-1.5 rounded-md text-xs font-bold bg-mom-dark text-white shadow-sm transition btn-active-scale" data-filter="none">原圖</button>
+                        <button class="filter-btn w-full py-1.5 rounded-md text-xs font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="film">復古</button>
+                        <button class="filter-btn w-full py-1.5 rounded-md text-xs font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="beauty">粉嫩</button>
+                        <button class="filter-btn w-full py-1.5 rounded-md text-xs font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="texture">質感</button>
+                        <button class="filter-btn w-full py-1.5 rounded-md text-xs font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="polaroid">溫暖</button>
+			<button class="filter-btn w-full py-1.5 rounded-md text-xs font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="cinematic">電影</button>
+                        <button class="filter-btn w-full py-1.5 rounded-md text-xs font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="hkmovie">懷舊</button>
+                        <button class="filter-btn w-full py-1.5 rounded-md text-xs font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="bw">黑白</button>
                     </div>
 
                     <div id="camera-main-controls" class="flex items-center justify-between px-6 py-2 hidden">
@@ -404,22 +406,34 @@
                         filterLayer1.style.backgroundColor = 'rgba(255, 230, 240, 0.15)';
                         filterLayer2.style.backgroundColor = 'transparent';
                     } else if (currentFilter === 'texture') {
-                        // 💎 質感濾鏡 (曝光-, 對比+, 高光壓暗, 偏冷)：
+                        // 質感濾鏡 (曝光-, 對比+, 高光壓暗, 偏冷)：
                         filterLayer1.style.mixBlendMode = 'multiply';
                         filterLayer1.style.backgroundColor = 'rgba(10, 30, 55, 0.25)'; // 降曝光、加冷色調、壓暗陰影
                         filterLayer2.style.mixBlendMode = 'overlay';
                         filterLayer2.style.backgroundColor = 'rgba(130, 130, 130, 0.3)'; // 增強鮮明度與對比
                     } else if (currentFilter === 'polaroid') {
-                        // 📷 拍立得 (褪色、暖橘、暗部偏洋紅)：
+                        // 溫暖 (褪色、暖橘、暗部偏洋紅)：
                         filterLayer1.style.mixBlendMode = 'multiply';
                         filterLayer1.style.backgroundColor = 'rgba(255, 200, 150, 0.2)';
                         filterLayer2.style.mixBlendMode = 'screen';
                         filterLayer2.style.backgroundColor = 'rgba(50, 20, 60, 0.25)';
                     } else if (currentFilter === 'bw') {
-                        // 🖤 經典黑白：
+                        // 經典黑白：
                         filterLayer1.style.mixBlendMode = 'color';
                         filterLayer1.style.backgroundColor = 'rgba(0, 0, 0, 1)';
                         filterLayer2.style.backgroundColor = 'transparent';
+                    } else if (currentFilter === 'cinematic') {
+                        // 歐美電影 (青橙色調 Teal & Orange)
+                        filterLayer1.style.mixBlendMode = 'multiply';
+                        filterLayer1.style.backgroundColor = 'rgba(0, 40, 80, 0.35)'; // 青藍色壓暗陰影
+                        filterLayer2.style.mixBlendMode = 'overlay';
+                        filterLayer2.style.backgroundColor = 'rgba(255, 150, 50, 0.25)'; // 橘色提亮高光與對比
+                    } else if (currentFilter === 'hkmovie') {
+                        // 懷舊電影 (復古墨綠與暖黃光)
+                        filterLayer1.style.mixBlendMode = 'multiply';
+                        filterLayer1.style.backgroundColor = 'rgba(20, 60, 40, 0.35)'; // 墨綠色底調
+                        filterLayer2.style.mixBlendMode = 'screen';
+                        filterLayer2.style.backgroundColor = 'rgba(200, 140, 40, 0.15)'; // 暖黃色泛光
                     }
                 });
             });
@@ -520,7 +534,11 @@
                 const ctx = canvas.getContext('2d');
                 const targetWidth = 900, targetHeight = 600;
                 canvas.width = targetWidth; canvas.height = targetHeight;
-                
+ 
+		// 💡 預防黑邊大絕招：先把主畫布塗滿白色！
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, targetWidth, targetHeight);
+
                 const videoRatio = video.videoWidth / video.videoHeight;
                 const targetRatio = targetWidth / targetHeight;
                 let sx, sy, sWidth, sHeight;
@@ -537,12 +555,17 @@
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = targetWidth; tempCanvas.height = targetHeight;
                 const tempCtx = tempCanvas.getContext('2d');
+
+		// 💡 預防黑邊大絕招：暫存畫布也要塗滿白色！
+                tempCtx.fillStyle = '#ffffff';
+                tempCtx.fillRect(0, 0, targetWidth, targetHeight);
                 
                 if (facingMode === "user") {
                     tempCtx.translate(targetWidth, 0); 
                     tempCtx.scale(-1, 1);
                 }
-                tempCtx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, targetWidth, targetHeight);
+		// 💡 加上 Math.round 讓小數點四捨五入，避免裁切出現半個像素
+                tempCtx.drawImage(video, Math.round(sx), Math.round(sy), Math.round(sWidth), Math.round(sHeight), 0, 0, targetWidth, targetHeight);
                 
                 // 把原圖畫到主畫布
                 ctx.drawImage(tempCanvas, 0, 0);
@@ -563,7 +586,7 @@
                     ctx.fillStyle = 'rgba(255, 230, 240, 0.15)';
                     ctx.fillRect(0, 0, targetWidth, targetHeight);
                 } else if (currentFilter === 'texture') {
-                    // 💎 質感濾鏡
+                    // 質感濾鏡
                     ctx.globalCompositeOperation = 'multiply';
                     ctx.fillStyle = 'rgba(10, 30, 55, 0.25)';
                     ctx.fillRect(0, 0, targetWidth, targetHeight);
@@ -571,7 +594,7 @@
                     ctx.fillStyle = 'rgba(130, 130, 130, 0.3)';
                     ctx.fillRect(0, 0, targetWidth, targetHeight);
                 } else if (currentFilter === 'polaroid') {
-                    // 📷 拍立得濾鏡
+                    // 溫暖濾鏡
                     ctx.globalCompositeOperation = 'multiply';
                     ctx.fillStyle = 'rgba(255, 200, 150, 0.2)';
                     ctx.fillRect(0, 0, targetWidth, targetHeight);
@@ -579,9 +602,25 @@
                     ctx.fillStyle = 'rgba(50, 20, 60, 0.25)';
                     ctx.fillRect(0, 0, targetWidth, targetHeight);
                 } else if (currentFilter === 'bw') {
-                    // 🖤 黑白濾鏡
+                    // 黑白濾鏡
                     ctx.globalCompositeOperation = 'color';
                     ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
+                } else if (currentFilter === 'cinematic') {
+                    // 歐美電影
+                    ctx.globalCompositeOperation = 'multiply';
+                    ctx.fillStyle = 'rgba(0, 40, 80, 0.35)';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
+                    ctx.globalCompositeOperation = 'overlay';
+                    ctx.fillStyle = 'rgba(255, 150, 50, 0.25)';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
+                } else if (currentFilter === 'hkmovie') {
+                    // 懷舊電影
+                    ctx.globalCompositeOperation = 'multiply';
+                    ctx.fillStyle = 'rgba(20, 60, 40, 0.35)';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
+                    ctx.globalCompositeOperation = 'screen';
+                    ctx.fillStyle = 'rgba(200, 140, 40, 0.15)';
                     ctx.fillRect(0, 0, targetWidth, targetHeight);
                 }
                 
