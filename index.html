@@ -83,9 +83,11 @@
             <!-- Left Panel: Camera & Controls -->
             <div class="w-full lg:w-[450px] flex flex-col gap-5 bg-white p-5 rounded-3xl shadow-xl border border-purple-100">
                 
-                <!-- Camera Viewport -->
                 <div class="relative w-full aspect-[4/3] bg-gray-900 rounded-2xl overflow-hidden shadow-inner flex items-center justify-center group bg-black">
                     <video id="webcam" autoplay muted playsinline webkit-playsinline class="w-full h-full object-cover hidden"></video>
+                    
+                    <div id="filter-layer-1" class="absolute inset-0 pointer-events-none transition-colors duration-300"></div>
+                    <div id="filter-layer-2" class="absolute inset-0 pointer-events-none transition-colors duration-300"></div>
                     
                     <div id="camera-placeholder" class="text-gray-400 flex flex-col items-center">
                         <svg class="w-16 h-16 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -99,12 +101,20 @@
                     <div id="flash" class="absolute inset-0 pointer-events-none opacity-0 z-20"></div>
                 </div>
 
-                <!-- Controls -->
                 <div class="flex flex-col gap-4">
                     <button id="btn-start" class="w-full bg-purple-100 hover:bg-purple-200 text-mom-dark font-bold py-4 px-4 rounded-xl transition shadow-sm flex items-center justify-center gap-2">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         點我允許使用相機權限
                     </button>
+
+		    <div id="filter-controls" class="grid grid-cols-6 gap-2 hidden transition-all mx-auto w-full max-w-[320px]">
+                        <button class="filter-btn w-full py-1.5 rounded-full text-sm font-bold bg-mom-dark text-white shadow-sm transition btn-active-scale" data-filter="none">原圖</button>
+                        <button class="filter-btn w-full py-1.5 rounded-full text-sm font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="film">底片</button>
+                        <button class="filter-btn w-full py-1.5 rounded-full text-sm font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="beauty">美顏</button>
+                        <button class="filter-btn w-full py-1.5 rounded-full text-sm font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="texture">質感</button>
+                        <button class="filter-btn w-full py-1.5 rounded-full text-sm font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="polaroid">溫暖</button>
+                        <button class="filter-btn w-full py-1.5 rounded-full text-sm font-bold bg-purple-100 text-purple-700 hover:bg-purple-200 shadow-sm transition btn-active-scale" data-filter="bw">黑白</button>
+                    </div>
 
                     <div id="camera-main-controls" class="flex items-center justify-between px-6 py-2 hidden">
                         <button id="btn-retake" class="flex flex-col items-center gap-1 text-gray-400 hover:text-mom-dark transition disabled:opacity-30 disabled:pointer-events-none" disabled title="重拍上一張">
@@ -311,19 +321,15 @@
         </div>
     </div>
 
-    <script>
-        // 💡 禁用雙指放大 (Pinch-to-zoom) 與 Safari 手勢縮放
+  <script>
+        // 💡 禁用雙指放大與 Safari 手勢縮放
         document.addEventListener('touchstart', function (event) {
-            if (event.touches.length > 1) {
-                event.preventDefault(); // 偵測到兩根以上手指時，阻止預設縮放行為
-            }
+            if (event.touches.length > 1) { event.preventDefault(); }
         }, { passive: false });
-        
-        document.addEventListener('gesturestart', function (event) {
-            event.preventDefault(); // 禁用 Safari 的原生手勢縮放
-        });
+        document.addEventListener('gesturestart', function (event) { event.preventDefault(); });
 
         document.addEventListener('DOMContentLoaded', () => {
+            // 取得 DOM 元素
             const video = document.getElementById('webcam');
             const placeholder = document.getElementById('camera-placeholder');
             const btnStart = document.getElementById('btn-start');
@@ -346,14 +352,23 @@
             const finalImg = document.getElementById('final-result-img');
             const btnCloseModal = document.getElementById('btn-close-modal');
 
+            // 💡 濾鏡相關 DOM
+            const filterLayer1 = document.getElementById('filter-layer-1');
+            const filterLayer2 = document.getElementById('filter-layer-2');
+            const filterControls = document.getElementById('filter-controls');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+
+            // 狀態變數
             let stream = null;
             let currentPhotoIndex = 0;
             const TOTAL_PHOTOS = 4;
             let isCountingDown = false;
             let facingMode = "user"; 
+            let currentFilter = 'none'; // 當前濾鏡狀態
 
             dateText.innerText = `HAPPY MOTHER'S DAY ${new Date().getFullYear()}`;
 
+            // 背景圖樣式
             const patternCanvas = document.createElement('canvas');
             patternCanvas.width = 20; patternCanvas.height = 20;
             const pCtx = patternCanvas.getContext('2d');
@@ -361,10 +376,56 @@
             pCtx.fillStyle = '#d8b4fe'; pCtx.beginPath(); pCtx.arc(10, 10, 1.5, 0, Math.PI * 2); pCtx.fill();
             document.getElementById('photostrip').style.backgroundImage = `url(${patternCanvas.toDataURL('image/png')})`;
 
+            // 💡 濾鏡切換邏輯
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    filterBtns.forEach(b => {
+                        b.classList.remove('bg-mom-dark', 'text-white');
+                        b.classList.add('bg-purple-100', 'text-purple-700');
+                    });
+                    e.target.classList.remove('bg-purple-100', 'text-purple-700');
+                    e.target.classList.add('bg-mom-dark', 'text-white');
+
+                    currentFilter = e.target.dataset.filter;
+
+                    // 同步預覽畫面 (mix-blend-mode)
+                    video.style.filter = 'none'; // 預設重置
+                    if (currentFilter === 'none') {
+                        filterLayer1.style.backgroundColor = 'transparent';
+                        filterLayer2.style.backgroundColor = 'transparent';
+                    } else if (currentFilter === 'film') {
+                        filterLayer1.style.mixBlendMode = 'multiply';
+                        filterLayer1.style.backgroundColor = 'rgba(255, 170, 80, 0.2)';
+                        filterLayer2.style.mixBlendMode = 'screen';
+                        filterLayer2.style.backgroundColor = 'rgba(40, 40, 40, 0.15)';
+                    } else if (currentFilter === 'beauty') {
+                        video.style.filter = 'blur(0.5px)'; 
+                        filterLayer1.style.mixBlendMode = 'screen';
+                        filterLayer1.style.backgroundColor = 'rgba(255, 230, 240, 0.15)';
+                        filterLayer2.style.backgroundColor = 'transparent';
+                    } else if (currentFilter === 'texture') {
+                        // 💎 質感濾鏡 (曝光-, 對比+, 高光壓暗, 偏冷)：
+                        filterLayer1.style.mixBlendMode = 'multiply';
+                        filterLayer1.style.backgroundColor = 'rgba(10, 30, 55, 0.25)'; // 降曝光、加冷色調、壓暗陰影
+                        filterLayer2.style.mixBlendMode = 'overlay';
+                        filterLayer2.style.backgroundColor = 'rgba(130, 130, 130, 0.3)'; // 增強鮮明度與對比
+                    } else if (currentFilter === 'polaroid') {
+                        // 📷 拍立得 (褪色、暖橘、暗部偏洋紅)：
+                        filterLayer1.style.mixBlendMode = 'multiply';
+                        filterLayer1.style.backgroundColor = 'rgba(255, 200, 150, 0.2)';
+                        filterLayer2.style.mixBlendMode = 'screen';
+                        filterLayer2.style.backgroundColor = 'rgba(50, 20, 60, 0.25)';
+                    } else if (currentFilter === 'bw') {
+                        // 🖤 經典黑白：
+                        filterLayer1.style.mixBlendMode = 'color';
+                        filterLayer1.style.backgroundColor = 'rgba(0, 0, 0, 1)';
+                        filterLayer2.style.backgroundColor = 'transparent';
+                    }
+                });
+            });
+
             async function startCamera() {
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                }
+                if (stream) { stream.getTracks().forEach(track => track.stop()); }
                 try {
                     stream = await navigator.mediaDevices.getUserMedia({ 
                         video: { facingMode: facingMode, width: { ideal: 1280 }, height: { ideal: 720 } }, 
@@ -383,6 +444,10 @@
                         video.classList.remove('hidden');
                         placeholder.classList.add('hidden');
                         btnStart.classList.add('hidden');
+                        
+                        // 確保安全地顯示控制列
+                        if (filterControls) filterControls.classList.remove('hidden');
+                        
                         cameraMainControls.classList.remove('hidden');
                         btnResetAll.classList.remove('hidden');
                         statusMessage.classList.remove('hidden');
@@ -390,7 +455,7 @@
                     };
                 } catch (err) {
                     console.error("Camera error:", err);
-                    alert("無法存取相機，請使用預設瀏覽器開啟。");
+                    alert("無法存取相機，請使用預設瀏覽器開啟或確認權限。");
                 }
             }
 
@@ -404,7 +469,6 @@
             btnRetake.addEventListener('click', async () => {
                 if (currentPhotoIndex > 0 && !isCountingDown) {
                     const wasAtMax = (currentPhotoIndex === TOTAL_PHOTOS);
-                    
                     const imgElement = document.getElementById(`photo-${currentPhotoIndex}`);
                     imgElement.src = "";
                     imgElement.classList.add('hidden');
@@ -416,9 +480,7 @@
                     btnCapture.classList.remove('hidden');
                     btnGenerate.classList.add('hidden');
 
-                    if (wasAtMax || video.classList.contains('hidden')) {
-                        await startCamera();
-                    }
+                    if (wasAtMax || video.classList.contains('hidden')) { await startCamera(); }
                     
                     updateUI();
                     statusMessage.innerText = `已移除上一張，準備重拍第 ${currentPhotoIndex + 1} 張。`;
@@ -427,16 +489,12 @@
 
             btnCapture.addEventListener('click', () => {
                 if (currentPhotoIndex === TOTAL_PHOTOS && !isCountingDown) {
-                    btnGenerate.click();
-                    return;
+                    btnGenerate.click(); return;
                 }
-                
                 if (currentPhotoIndex >= TOTAL_PHOTOS || isCountingDown) return;
                 
                 isCountingDown = true;
-                btnCapture.disabled = true;
-                btnRetake.disabled = true;
-                btnFlip.disabled = true;
+                btnCapture.disabled = true; btnRetake.disabled = true; btnFlip.disabled = true;
                 
                 let count = 3;
                 countdownOverlay.innerText = count;
@@ -474,17 +532,62 @@
                     sWidth = video.videoWidth; sHeight = sWidth / targetRatio;
                     sx = 0; sy = (video.videoHeight - sHeight) / 2;
                 }
+
+                // 先把原圖畫在暫存畫布上
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = targetWidth; tempCanvas.height = targetHeight;
+                const tempCtx = tempCanvas.getContext('2d');
                 
                 if (facingMode === "user") {
-                    ctx.translate(targetWidth, 0); 
-                    ctx.scale(-1, 1);
+                    tempCtx.translate(targetWidth, 0); 
+                    tempCtx.scale(-1, 1);
+                }
+                tempCtx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, targetWidth, targetHeight);
+                
+                // 把原圖畫到主畫布
+                ctx.drawImage(tempCanvas, 0, 0);
+                
+                // 💡 Canvas 手動濾鏡疊加邏輯 (100% 同步預覽)
+                if (currentFilter === 'film') {
+                    ctx.globalCompositeOperation = 'multiply';
+                    ctx.fillStyle = 'rgba(255, 170, 80, 0.2)';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
+                    ctx.globalCompositeOperation = 'screen';
+                    ctx.fillStyle = 'rgba(40, 40, 40, 0.15)';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
+                } else if (currentFilter === 'beauty') {
+                    ctx.globalAlpha = 0.4;
+                    ctx.drawImage(tempCanvas, -2, -2, targetWidth + 4, targetHeight + 4);
+                    ctx.globalAlpha = 1.0;
+                    ctx.globalCompositeOperation = 'screen';
+                    ctx.fillStyle = 'rgba(255, 230, 240, 0.15)';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
+                } else if (currentFilter === 'texture') {
+                    // 💎 質感濾鏡
+                    ctx.globalCompositeOperation = 'multiply';
+                    ctx.fillStyle = 'rgba(10, 30, 55, 0.25)';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
+                    ctx.globalCompositeOperation = 'overlay';
+                    ctx.fillStyle = 'rgba(130, 130, 130, 0.3)';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
+                } else if (currentFilter === 'polaroid') {
+                    // 📷 拍立得濾鏡
+                    ctx.globalCompositeOperation = 'multiply';
+                    ctx.fillStyle = 'rgba(255, 200, 150, 0.2)';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
+                    ctx.globalCompositeOperation = 'screen';
+                    ctx.fillStyle = 'rgba(50, 20, 60, 0.25)';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
+                } else if (currentFilter === 'bw') {
+                    // 🖤 黑白濾鏡
+                    ctx.globalCompositeOperation = 'color';
+                    ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
                 }
                 
-                ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, targetWidth, targetHeight);
-                
-                ctx.setTransform(1, 0, 0, 1, 0, 0);
-                
-                ctx.fillStyle = 'rgba(216, 180, 254, 0.03)'; ctx.fillRect(0, 0, targetWidth, targetHeight);
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.fillStyle = 'rgba(216, 180, 254, 0.03)'; 
+                ctx.fillRect(0, 0, targetWidth, targetHeight);
                 
                 currentPhotoIndex++;
                 const imgElement = document.getElementById(`photo-${currentPhotoIndex}`);
@@ -497,9 +600,7 @@
                 
                 if (currentPhotoIndex === TOTAL_PHOTOS) {
                     isCountingDown = false;
-                    btnCapture.disabled = false;
-                    btnRetake.disabled = false;
-                    btnFlip.disabled = false;
+                    btnCapture.disabled = false; btnRetake.disabled = false; btnFlip.disabled = false;
                     updateUI();
                     statusMessage.innerText = "拍攝完成！請按下打勾按鈕產生圖片！";
                     
@@ -512,9 +613,7 @@
                 } else {
                     setTimeout(() => {
                         isCountingDown = false;
-                        btnCapture.disabled = false;
-                        btnRetake.disabled = false;
-                        btnFlip.disabled = false;
+                        btnCapture.disabled = false; btnRetake.disabled = false; btnFlip.disabled = false;
                         iconCamera.classList.remove('hidden');
                         iconCheck.classList.add('hidden');
                         btnCapture.classList.replace('bg-green-500', 'bg-mom-dark');
@@ -558,7 +657,6 @@
                         useCORS: true, 
                         backgroundColor: '#faf5ff',
                         logging: false,
-                        // 💡 移除舊版的 transform，改用安全的方式排版匯出
                         onclone: (clonedDoc) => {
                             const content = clonedDoc.getElementById('photostrip-content');
                             if (content) {
